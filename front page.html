@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Story & Poem Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <a href="poemgenerator.py"></a>
+    <a href="server.js"></a>
+    <style>
+        :root{
+            --bg1: #0f172a;
+            --bg2: #0b1220;
+            --accent: #8b5cf6; /* purple */
+            --muted: #94a3b8;
+            --card: rgba(255,255,255,0.04);
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial}
+        body{
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(139,92,246,0.12), transparent),
+                        radial-gradient(900px 400px at 90% 90%, rgba(14,165,233,0.06), transparent),
+                        linear-gradient(180deg,var(--bg1),var(--bg2));
+            color:#e6eef8;
+            -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+            padding:32px;
+        }
+        .container{max-width:1100px;margin:0 auto}
+
+        header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+        .brand{display:flex;gap:12px;align-items:center}
+        .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 6px 20px rgba(11,14,25,0.6)}
+        .brand h1{font-size:18px;margin:0}
+        nav{display:flex;gap:14px;align-items:center}
+        nav a{color:var(--muted);text-decoration:none;font-weight:600}
+
+        .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center}
+        .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:36px;border-radius:16px;box-shadow:0 8px 30px rgba(2,6,23,0.6);}
+        .eyebrow{color:var(--muted);font-weight:600;font-size:13px;letter-spacing:0.06em}
+        h2{font-size:34px;margin:12px 0 8px;line-height:1.05}
+        p.lead{color: #cfe7ff;margin:0 0 18px}
+        .cta-row{display:flex;gap:12px}
+        .btn{padding:12px 16px;border-radius:12px;border:0;font-weight:700;cursor:pointer}
+        .btn-primary{background:linear-gradient(90deg,var(--accent),#06b6d4);color:#041024;box-shadow:0 8px 20px rgba(139,92,246,0.18)}
+        .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+        .features{display:flex;gap:10px;margin-top:20px}
+        .feature{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--card)}
+        .feature svg{width:22px;height:22px;opacity:0.95}
+
+        /* right column mockup */
+        .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px}
+        .panel h3{margin:0 0 8px;font-size:15px}
+        .prompt-input{display:flex;gap:8px}
+        .prompt-input input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+        .small-cta{padding:10px 12px;border-radius:10px;border:0;background:rgba(255,255,255,0.04);font-weight:700}
+
+        .preview{margin-top:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:14px;border-radius:10px;min-height:140px;color:#d9f0ff;overflow:auto}
+
+        /* footer */
+        footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between}
+
+        /* responsive */
+        @media (max-width:900px){
+            .hero{grid-template-columns:1fr}
+            .panel{order:2}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="logo">AI</div>
+                <div>
+                    <h1>AI Story & Poem Generator</h1>
+                    <div style="color:var(--muted);font-size:13px">Create original stories & poems in seconds</div>
+                </div>
+            </div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#examples">Examples</a>
+                <a href="#about">About</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="hero-card">
+                <div class="eyebrow">Create • Inspire • Share</div>
+                <h2>Turn one idea into a full story or a poem — instantly.</h2>
+                <p class="lead">Write with a creative AI assistant tuned for storytelling and verse. Choose tone, length, and style — then let the model craft scenes, metaphors, and memorable lines.</p>
+
+                <div class="cta-row">
+                    <button class="btn btn-primary" onclick="scrollToPrompt('story')">Generate Story</button>
+                    <button class="btn btn-ghost" onclick="scrollToPrompt('poem')">Generate Poem</button>
+                </div>
+
+                <div class="features" id="features">
+                    <div class="feature"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15 8l6 .5-4.5 3L18 20l-6-3-6 3 1.5-8.5L2 8.5 8 8 12 2z" fill="white" opacity="0.95"/></svg><div><strong>Creative Modes</strong><div style="font-size:12px;color:var(--muted)">Story, Poem, Microfiction</div></div></div>
+                    <div class="feature"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong>Tone Control</strong><div style="font-size:12px;color:var(--muted)">Playful, Dark, Romantic</div></div></div>
+                    <div class="feature"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.4"/></svg><div><strong>Export</strong><div style="font-size:12px;color:var(--muted)">Copy, Download, Share</div></div></div>
+                </div>
+            </div>
+
+            <aside class="panel">
+                <h3 id="prompt-title">Try a prompt</h3>
+                <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Enter a short idea (characters, mood or a sentence)</div>
+                <div class="prompt-input">
+                    <input id="prompt" placeholder="e.g. A lonely lighthouse keeper finds a message in a bottle" />
+                    <button class="small-cta" onclick="quickGenerate('story')">Story</button>
+                    <button class="small-cta" onclick="quickGenerate('poem')">Poem</button>
+                </div>
+
+                <div class="preview" id="preview">Your generated story or poem will appear here. Try: "A street musician who hears colors"</div>
+            </aside>
+        </section>
+
+        <footer>
+            <div>Made with ♥ — AI Story & Poem Generator</div>
+            <div style="color:var(--muted)">v1.0 • Lightweight front page mockup</div>
+        </footer>
+    </div>
+
+    <script>
+        // Initial setup/mock functions (unchanged)
+        function scrollToPrompt(kind){
+            const preview = document.getElementById('preview');
+            document.getElementById('prompt').focus();
+            if(kind==='poem'){
+                document.getElementById('prompt').value = 'A quiet park bench at sunrise, rhyme and rhythm';
+            }else{
+                document.getElementById('prompt').value = 'A lonely lighthouse keeper finds a message in a bottle';
+            }
+            preview.textContent = "Click 'Story' or 'Poem' to simulate generation. This is a front-end mock — connect to your AI backend to produce real text.";
+        }
+
+        // ⚠️ NEW quickGenerate FUNCTION: Calls the Node.js Backend ⚠️
+        async function quickGenerate(kind) {
+            const p = document.getElementById('prompt').value.trim();
+            const preview = document.getElementById('preview');
+            if (!p) {
+                preview.textContent = 'Please enter a short prompt first.';
+                return;
+            }
+
+            preview.textContent = 'Generating... please wait.';
+
+            try {
+                // Call your Node.js backend server, which will handle the API key securely
+                const response = await fetch("http://localhost:4000/api/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        prompt: p,
+                        kind: kind
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    // Log the error for better debugging
+                    console.error("Server Error Response:", errorData);
+                    preview.textContent = `Error from server: ${errorData.error || 'Unknown error. Check the Node.js server console.'}`;
+                    return;
+                }
+                
+                // The server returns a JSON object with the generated text under the key 'text'
+                const data = await response.json();
+
+                if (data.text) {
+                    preview.textContent = data.text;
+                } else {
+                    preview.textContent = "Error: No text content was returned from the backend."; 
+                }
+            } catch (err) {
+                // Catches network errors (server is down, CORS issue, etc.)
+                preview.textContent = "Error: Could not connect to the backend server. Make sure your Node.js server is running on http://localhost:4000.";
+                console.error(err);
+            }
+        }
+    </script>
+
+</body>
+</html>
